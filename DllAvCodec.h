@@ -104,6 +104,7 @@ public:
   virtual AVCodec *av_codec_next(AVCodec *c)=0;
   virtual int av_dup_packet(AVPacket *pkt)=0;
   virtual void av_init_packet(AVPacket *pkt)=0;
+  virtual int avcodec_copy_context(AVCodecContext *dest, const AVCodecContext *src)=0;
 };
 
 #if (defined USE_EXTERNAL_FFMPEG) || (defined TARGET_DARWIN)
@@ -166,6 +167,7 @@ public:
 
   virtual int av_dup_packet(AVPacket *pkt) { return ::av_dup_packet(pkt); }
   virtual void av_init_packet(AVPacket *pkt) { return ::av_init_packet(pkt); }
+  virtual int avcodec_copy_context(AVCodecContext *dest, const AVCodecContext *src) {return ::avcodec_copy_context(dest,src);}
 
   // DLL faking.
   virtual bool ResolveExports() { return true; }
@@ -211,7 +213,7 @@ class DllAvCodec : public DllDynamic, DllAvCodecInterface
   DEFINE_METHOD4(int, avpicture_alloc, (AVPicture *p1, AVPixelFormat p2, int p3, int p4))
   DEFINE_METHOD2(int, avcodec_default_get_buffer2, (AVCodecContext *p1, AVFrame *p2, int flags))
   DEFINE_METHOD2(enum AVPixelFormat, avcodec_default_get_format, (struct AVCodecContext *p1, const enum AVPixelFormat *p2))
-
+  DEFINE_METHOD2(int, avcodec_copy_context, (struct AVCodecContext *p1, struct AVCodecContext *p2))
   DEFINE_METHOD1(AVCodec*, av_codec_next, (AVCodec *p1))
   BEGIN_METHOD_RESOLVE()
     RESOLVE_METHOD(avcodec_flush_buffers)
@@ -244,6 +246,7 @@ class DllAvCodec : public DllDynamic, DllAvCodecInterface
     RESOLVE_METHOD(av_codec_next)
     RESOLVE_METHOD(av_dup_packet)
     RESOLVE_METHOD(av_init_packet)
+    RESOLVE_METHOD(avcodec_copy_context)
   END_METHOD_RESOLVE()
 
   /* dependencies of libavcodec */

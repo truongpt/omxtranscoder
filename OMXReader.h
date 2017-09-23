@@ -116,6 +116,8 @@ protected:
   bool                      m_eof;
   OMXChapter                m_chapters[MAX_OMX_CHAPTERS];
   OMXStream                 m_streams[MAX_STREAMS];
+  AVPacket                  m_av_pkt;
+  AVMediaType               m_codec_type;
   int                       m_chapter_count;
   double                    m_iCurrentPts;
   int                       m_speed;
@@ -139,6 +141,9 @@ public:
   bool SeekTime(int time, bool backwords, double *startpts);
   AVMediaType PacketType(OMXPacket *pkt);
   OMXPacket *Read();
+  AVPacket *GetPacket();
+  bool FreePacket();
+
   void Process();
   bool GetStreams();
   void AddStream(int id);
@@ -169,6 +174,8 @@ public:
   int GetAudioIndex() { return (m_audio_index >= 0) ? m_streams[m_audio_index].index : -1; };
   int GetSubtitleIndex() { return (m_subtitle_index >= 0) ? m_streams[m_subtitle_index].index : -1; };
   int GetVideoIndex() { return (m_video_index >= 0) ? m_streams[m_video_index].index : -1; };
+  AVFormatContext* GetFormatCxt() { return m_pFormatContext; }
+  AVMediaType GetCodecType() {return m_codec_type; }
   std::string getFilename() const { return m_filename; }
 
   int GetRelativeIndex(size_t index)

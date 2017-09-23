@@ -49,8 +49,6 @@ class OMXVideoConfig
 public:
   COMXStreamInfo hints;
   bool use_thread;
-  CRect dst_rect;
-  CRect src_rect;
   float display_aspect;
   EDEINTERLACEMODE deinterlace;
   bool advanced_hd_deinterlace;
@@ -67,14 +65,11 @@ public:
   OMXVideoConfig()
   {
     use_thread = true;
-    dst_rect.SetRect(0, 0, 0, 0);
-    src_rect.SetRect(0, 0, 0, 0);
     display_aspect = 0.0f;
     deinterlace = VS_DEINTERLACEMODE_AUTO;
     advanced_hd_deinterlace = true;
     anaglyph = OMX_ImageFilterAnaglyphNone;
-    hdmi_clock_sync = false;
-    allow_mvc = false;
+
     alpha = 255;
     aspectMode = 0;
     display = 0;
@@ -105,45 +100,30 @@ public:
   void Reset(void);
   void SetDropState(bool bDrop);
   std::string GetDecoderName() { return m_video_codec_name; };
-  void SetVideoRect(const CRect& SrcRect, const CRect& DestRect);
-  void SetVideoRect(int aspectMode);
-  void SetVideoRect();
-  void SetAlpha(int alpha);
   int GetInputBufferSize();
   void SubmitEOS();
   bool IsEOS();
   bool SubmittedEOS() { return m_submitted_eos; }
   bool BadState() { return m_omx_decoder.BadState(); };
+  void SetCallBack(enc_done_cbk cb);
+
+  void DumpPort(OMX_PARAM_PORTDEFINITIONTYPE& port_def);
+  void DumpPort(OMX_PARAM_BUFFERSUPPLIERTYPE& port_def);
+  void DumpCompState(COMXCoreComponent* comp);
 protected:
-  // Video format
-  bool              m_drop_state;
-
   OMX_VIDEO_CODINGTYPE m_codingType;
-
   COMXCoreComponent m_omx_decoder;
-  COMXCoreComponent m_omx_render;
-  COMXCoreComponent m_omx_sched;
-  COMXCoreComponent m_omx_image_fx;
-  COMXCoreComponent *m_omx_clock;
-  OMXClock           *m_av_clock;
-
+  COMXCoreComponent m_omx_encoder;
   COMXCoreTunel     m_omx_tunnel_decoder;
-  COMXCoreTunel     m_omx_tunnel_clock;
-  COMXCoreTunel     m_omx_tunnel_sched;
-  COMXCoreTunel     m_omx_tunnel_image_fx;
+  enc_done_cbk m_enc_done_cb;
+  
+  bool              m_drop_state;
   bool              m_is_open;
-
   bool              m_setStartTime;
-
   std::string       m_video_codec_name;
-
-  bool              m_deinterlace;
   OMXVideoConfig    m_config;
-
-  float             m_pixel_aspect;
   bool              m_submitted_eos;
   bool              m_failed_eos;
-  OMX_DISPLAYTRANSFORMTYPE m_transform;
   bool              m_settings_changed;
   CCriticalSection  m_critSection;
 };

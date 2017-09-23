@@ -33,6 +33,9 @@
 
 #include "linux/XMemUtils.h"
 
+// #define DBG_PRINT printf
+#define DBG_PRINT(...)
+
 OMXPlayerVideo::OMXPlayerVideo()
 {
   m_open          = false;
@@ -89,7 +92,7 @@ void OMXPlayerVideo::UnLockDecoder()
 
 bool OMXPlayerVideo::Open(OMXClock *av_clock, const OMXVideoConfig &config)
 {
-  if (!m_dllAvUtil.Load() || !m_dllAvCodec.Load() || !m_dllAvFormat.Load() || !av_clock)
+  if (!m_dllAvUtil.Load() || !m_dllAvCodec.Load() || !m_dllAvFormat.Load())
     return false;
   
   if(ThreadHandle())
@@ -98,7 +101,6 @@ bool OMXPlayerVideo::Open(OMXClock *av_clock, const OMXVideoConfig &config)
   m_dllAvFormat.av_register_all();
 
   m_config      = config;
-  m_av_clock    = av_clock;
   m_fps         = 25.0f;
   m_frametime   = 0;
   m_iCurrentPts = DVD_NOPTS_VALUE;
@@ -174,21 +176,6 @@ bool OMXPlayerVideo::Close()
   return true;
 }
 
-void OMXPlayerVideo::SetAlpha(int alpha)
-{
-  m_decoder->SetAlpha(alpha);
-}
-
-void OMXPlayerVideo::SetVideoRect(const CRect& SrcRect, const CRect& DestRect)
-{
-  m_decoder->SetVideoRect(SrcRect, DestRect);
-}
-
-void OMXPlayerVideo::SetVideoRect(int aspectMode)
-{
-  m_decoder->SetVideoRect(aspectMode);
-}
-
 bool OMXPlayerVideo::Decode(OMXPacket *pkt)
 {
   if(!pkt)
@@ -224,12 +211,14 @@ void OMXPlayerVideo::Process()
   while(true)
   {
     Lock();
+    DBG_PRINT("%s %d\n",__func__,__LINE__);
     if(!(m_bStop || m_bAbort) && m_packets.empty())
       pthread_cond_wait(&m_packet_cond, &m_lock);
-
+    DBG_PRINT("%s %d\n",__func__,__LINE__);
     if (m_bStop || m_bAbort)
     {
       UnLock();
+      DBG_PRINT("%s %d\n",__func__,__LINE__);
       break;
     }
 
@@ -310,6 +299,10 @@ bool OMXPlayerVideo::AddPacket(OMXPacket *pkt)
   return ret;
 }
 
+void OMXPlayerVideo::SetCallBack(enc_done_cbk cb)
+{
+  m_decoder->SetCallBack(cb);
+}
 
 bool OMXPlayerVideo::OpenDecoder()
 {

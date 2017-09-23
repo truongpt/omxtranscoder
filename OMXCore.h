@@ -35,7 +35,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // debug spew defines
-#if 0
+#if 1
 #define OMX_DEBUG_VERBOSE
 #define OMX_DEBUG_EVENTHANDLER
 #endif
@@ -80,6 +80,8 @@ private:
   bool              m_tunnel_set;
 };
 
+typedef void (*enc_done_cbk) (OMX_BUFFERHEADERTYPE* pBuffer);
+
 class COMXCoreComponent
 {
 public:
@@ -106,6 +108,7 @@ public:
   OMX_ERRORTYPE EnablePort(unsigned int port, bool wait = true);
   OMX_ERRORTYPE DisablePort(unsigned int port, bool wait = true);
   OMX_ERRORTYPE UseEGLImage(OMX_BUFFERHEADERTYPE** ppBufferHdr, OMX_U32 nPortIndex, OMX_PTR pAppPrivate, void* eglImage);
+  void SetPrivateCallBack(enc_done_cbk cb);
 
   bool          Initialize( const std::string &component_name, OMX_INDEXTYPE index, OMX_CALLBACKTYPE *callbacks = NULL);
   bool          IsInitialized() const { return m_handle != NULL; }
@@ -199,6 +202,8 @@ private:
   bool          m_flush_input;
   bool          m_flush_output;
   bool          m_resource_error;
+  //Only for encoder
+  enc_done_cbk m_enc_private_cb;  
 };
 
 class COMXCore

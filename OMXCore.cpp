@@ -164,16 +164,17 @@ OMX_ERRORTYPE COMXCoreTunel::Establish(bool enable_ports /* = true */, bool disa
     return OMX_ErrorUndefined;
   }
 
-  if(m_src_component->GetState() == OMX_StateLoaded)
-  {
-    omx_err = m_src_component->SetStateForComponent(OMX_StateIdle);
-    if(omx_err != OMX_ErrorNone)
-    {
-      CLog::Log(LOGERROR, "COMXCoreTunel::Establish - Error setting state to idle %s omx_err(0x%08x)", 
-          m_src_component->GetName().c_str(), (int)omx_err);
-      return omx_err;
-    }
-  }
+  //TODO(truong): investigate why need change to Idle state?
+  // if(m_src_component->GetState() == OMX_StateLoaded)
+  // {
+  //   omx_err = m_src_component->SetStateForComponent(OMX_StateIdle);
+  //   if(omx_err != OMX_ErrorNone)
+  //   {
+  //     CLog::Log(LOGERROR, "COMXCoreTunel::Establish - Error setting state to idle %s omx_err(0x%08x)", 
+  //         m_src_component->GetName().c_str(), (int)omx_err);
+  //     return omx_err;
+  //   }
+  // }
 
   if(m_src_component->GetComponent() && disable_ports)
   {
@@ -225,7 +226,7 @@ OMX_ERRORTYPE COMXCoreTunel::Establish(bool enable_ports /* = true */, bool disa
       CLog::Log(LOGERROR, "COMXCoreTunel::Establish - could not setup tunnel src %s port %d dst %s port %d omx_err(0x%08x)\n", 
           m_src_component->GetName().c_str(), m_src_port, m_dst_component->GetName().c_str(), m_dst_port, (int)omx_err);
       return omx_err;
-    }
+    }    
   }
   else
   {
@@ -265,16 +266,16 @@ OMX_ERRORTYPE COMXCoreTunel::Establish(bool enable_ports /* = true */, bool disa
       return omx_err;
     }
 
-    if(m_dst_component->GetState() == OMX_StateLoaded)
-    {
-      omx_err = m_dst_component->SetStateForComponent(OMX_StateIdle);
-      if(omx_err != OMX_ErrorNone)
-      {
-        CLog::Log(LOGERROR, "COMXCoreComponent::Establish - Error setting state to idle %s omx_err(0x%08x)", 
-            m_src_component->GetName().c_str(), (int)omx_err);
-        return omx_err;
-      }
-    }
+    // if(m_dst_component->GetState() == OMX_StateLoaded)
+    // {
+    //   omx_err = m_dst_component->SetStateForComponent(OMX_StateIdle);
+    //   if(omx_err != OMX_ErrorNone)
+    //   {
+    //     CLog::Log(LOGERROR, "COMXCoreComponent::Establish - Error setting state to idle %s omx_err(0x%08x)", 
+    //         m_src_component->GetName().c_str(), (int)omx_err);
+    //     return omx_err;
+    //   }
+    // }
   }
 
   if(m_src_component->GetComponent() && enable_ports)
@@ -1385,6 +1386,12 @@ else
 }
 }
 
+void COMXCoreComponent::SetPrivateCallBack(enc_done_cbk cb)
+{
+  m_enc_private_cb = cb;
+}
+
+
 bool COMXCoreComponent::Initialize( const std::string &component_name, OMX_INDEXTYPE index, OMX_CALLBACKTYPE *callbacks)
 {
   OMX_ERRORTYPE omx_err;
@@ -1600,6 +1607,15 @@ OMX_ERRORTYPE COMXCoreComponent::DecoderFillBufferDone(OMX_HANDLETYPE hComponent
   if(m_exit)
     return OMX_ErrorNone;
 
+  if (0 == strcmp(m_componentName.c_str(),"OMX.broadcom.video_encode"))
+  {
+    if (NULL != m_enc_private_cb)
+    {
+      m_enc_private_cb(pBuffer);
+    }
+    
+  }
+  
   #if defined(OMX_DEBUG_EVENTHANDLER)
   CLog::Log(LOGDEBUG, "COMXCoreComponent::DecoderFillBufferDone component(%s) %p %d/%d\n", m_componentName.c_str(), pBuffer, m_omx_output_available.size(), m_output_buffer_count);
   #endif
