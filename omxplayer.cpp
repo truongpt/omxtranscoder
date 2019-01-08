@@ -59,7 +59,6 @@ extern "C" {
 #include <string>
 #include <utility>
 
-#include "version.h"
 
 // when we repeatedly seek, rather than play continuously
 #define TRICKPLAY(speed) (speed < 0 || speed > 4 * DVD_PLAYSPEED_NORMAL)
@@ -106,9 +105,6 @@ void print_keybindings()
 void print_version()
 {
   printf("omxplayer - Commandline multimedia player for the Raspberry Pi\n");
-  printf("        Build date: %s\n", VERSION_DATE);
-  printf("        Version   : %s [%s]\n", VERSION_HASH, VERSION_BRANCH);
-  printf("        Repository: %s\n", VERSION_REPO);
 }
 
 static float get_display_aspect_ratio(HDMI_ASPECT_T aspect)
