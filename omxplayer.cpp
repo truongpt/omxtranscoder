@@ -52,7 +52,6 @@ extern "C" {
 #include "OMXMuxer.h"
 #include "DllOMX.h"
 #include "Srt.h"
-#include "KeyConfig.h"
 #include "utils/Strprintf.h"
 
 #include <string>
@@ -96,16 +95,10 @@ enum{ERROR=-1,SUCCESS,ONEBYTE};
 
 void print_usage()
 {
-  printf(
-#include "help.h"
-  );
 }
 
 void print_keybindings()
 {
-  printf(
-#include "keys.h"
-  );
 }
 
 void print_version()
@@ -336,9 +329,6 @@ int main(int argc, char *argv[])
   int c;
   std::string mode;
 
-  //Build default keymap just in case the --key-config option isn't used
-  map<int,int> keymap = KeyConfig::buildDefaultKeymap();
-
   while ((c = getopt_long(argc, argv, "wiIhvkn:l:o:cslb::pd3:Myzt:rg", longopts, NULL)) != -1)
   {
     switch (c) 
@@ -417,9 +407,6 @@ int main(int argc, char *argv[])
         break;
       case dbus_name_opt:
         m_dbus_name = optarg;
-        break;
-      case key_config_opt:
-        keymap = KeyConfig::parseConfigFile(optarg);
         break;
       case layer_opt:
         m_config_video.layer = atoi(optarg);
