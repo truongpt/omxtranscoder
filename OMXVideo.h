@@ -30,7 +30,6 @@
 #include "OMXClock.h"
 #include "OMXReader.h"
 
-#include "guilib/Geometry.h"
 #include "utils/SingleLock.h"
 
 #define VIDEO_BUFFERS 60
