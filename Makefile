@@ -12,8 +12,6 @@ SRC=	linux/XMemUtils.cpp \
 		DynamicDll.cpp \
 		utils/PCMRemap.cpp \
 		utils/RegExp.cpp \
-		OMXSubtitleTagSami.cpp \
-		OMXOverlayCodecText.cpp \
 		BitstreamConverter.cpp \
 		linux/RBP.cpp \
 		OMXThread.cpp \
@@ -24,10 +22,7 @@ SRC=	linux/XMemUtils.cpp \
 		OMXClock.cpp \
 		File.cpp \
 		OMXPlayerVideo.cpp \
-		OMXPlayerSubtitles.cpp \
 		OMXMuxer.cpp \
-		SubtitleRenderer.cpp \
-		Unicode.cpp \
 		Srt.cpp \
 		omxplayer.cpp
 
@@ -39,27 +34,9 @@ all: omxplayer
 	@rm -f $@ 
 	$(CXX) $(CFLAGS) $(INCLUDES) -c $< -o $@ -Wno-deprecated-declarations
 
-omxplayer.o: help.h keys.h
-
-version:
-	bash gen_version.sh > version.h 
-
-omxplayer: version $(OBJS)
+omxplayer: $(OBJS)
 	$(CXX) $(LDFLAGS) -o omxplayer $(OBJS) -lvchiq_arm -lvchostif -lvcos -ldbus-1 -lrt -lpthread -lavutil -lavcodec -lavformat -lswscale -lswresample -lpcre
 	$(STRIP) omxplayer
-
-help.h: README.md Makefile
-	awk '/SYNOPSIS/{p=1;print;next} p&&/KEY BINDINGS/{p=0};p' $< \
-	| sed -e '1,3 d' -e 's/^/"/' -e 's/$$/\\n"/' \
-	> $@
-keys.h: README.md Makefile
-	awk '/KEY BINDINGS/{p=1;print;next} p&&/KEY CONFIG/{p=0};p' $< \
-	| sed -e '1,3 d' -e 's/^/"/' -e 's/$$/\\n"/' \
-	> $@
-
-omxplayer.1: README.md
-	sed -e '/DOWNLOADING/,/omxplayer-dist/ d; /DBUS/,$$ d' $< >MAN
-	curl -F page=@MAN http://mantastic.herokuapp.com 2>/dev/null >$@
 
 clean:
 	for i in $(OBJS); do (if test -e "$$i"; then ( rm $$i ); fi ); done

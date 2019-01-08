@@ -26,6 +26,9 @@
 #include <sys/ioctl.h>
 #include <getopt.h>
 #include <string.h>
+#include <string>
+#include <vector>
+#include <sys/stat.h>
 
 #define AV_NOWARN_DEPRECATED
 
@@ -48,7 +51,6 @@ extern "C" {
 #include "OMXClock.h"
 #include "OMXReader.h"
 #include "OMXPlayerVideo.h"
-#include "OMXPlayerSubtitles.h"
 #include "OMXMuxer.h"
 #include "DllOMX.h"
 #include "Srt.h"

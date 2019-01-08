@@ -50,35 +50,3 @@ T& getline(T&& input, U&& str) {
   }
   return input;
 }
-
-bool ReadSrt(const std::string& filename, std::vector<Subtitle>& subtitles) {
-  std::ifstream srt(filename);
-  if (!srt) return false;
-
-  for (std::string line; getline(srt, line);) {
-    unsigned int h, m, s, f, h2, m2, s2, f2;
-
-    if (sscanf(line.c_str(), "%u:%u:%u,%u --> %u:%u:%u,%u",
-               &h, &m, &s, &f, &h2, &m2, &s2, &f2)
-        != 8)
-    {
-      continue;
-    }
-
-    auto start = (int) timecode_to_milliseconds(h, m, s, f);
-    auto stop = (int) timecode_to_milliseconds(h2, m2, s2 ,f2);
-
-    std::vector<std::string> text_lines;
-    while (getline(srt, line)) {
-      if (line.empty()) break;
-      text_lines.push_back(std::move(line));
-    }
-
-    if (!subtitles.empty() && subtitles.back().stop > stop)
-      continue;
-
-    subtitles.emplace_back(start, stop, std::move(text_lines));
-  }
-
-  return true;
-}
