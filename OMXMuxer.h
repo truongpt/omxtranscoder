@@ -12,13 +12,19 @@
 #ifndef _OMX_MUXER_H_
 #define _OMX_MUXER_H_
 
-#include "DllAvUtil.h"
-#include "DllAvFormat.h"
-#include "DllAvCodec.h"
 
 #include "OMXCore.h"
 #include "OMXStreamInfo.h"
 #include "OMXThread.h"
+#include "utils/log.h"
+
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/avutil.h>
+#include <libavutil/crc.h>
+#include <libavutil/fifo.h>
+}
 
 #include <deque>
 #include <sys/types.h>

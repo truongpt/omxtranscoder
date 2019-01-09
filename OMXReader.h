@@ -22,9 +22,18 @@
 #ifndef _OMX_READER_H_
 #define _OMX_READER_H_
 
-#include "DllAvUtil.h"
-#include "DllAvFormat.h"
-#include "DllAvCodec.h"
+#include "utils/log.h"
+#include "utils/StdString.h"
+
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavutil/opt.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/avutil.h>
+#include <libavutil/crc.h>
+#include <libavutil/fifo.h>
+}
+
 #include "OMXStreamInfo.h"
 #include "OMXThread.h"
 #include <queue>

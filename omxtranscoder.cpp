@@ -32,18 +32,21 @@
 
 #define AV_NOWARN_DEPRECATED
 
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavutil/avutil.h>
-};
 
 #include "OMXStreamInfo.h"
 
 #include "utils/log.h"
 
-#include "DllAvUtil.h"
-#include "DllAvFormat.h"
-#include "DllAvCodec.h"
+#include "utils/StdString.h"
+
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavutil/opt.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/avutil.h>
+#include <libavutil/crc.h>
+#include <libavutil/fifo.h>
+}
 #include "linux/RBP.h"
 
 #include "OMXVideo.h"

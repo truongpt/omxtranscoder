@@ -36,8 +36,6 @@
 
 OMXClock::OMXClock()
 {
-  m_dllAvFormat.Load();
-
   m_pause       = false;
 
   m_omx_speed = DVD_PLAYSPEED_NORMAL;
@@ -54,7 +52,6 @@ OMXClock::~OMXClock()
 {
   OMXDeinitialize();
 
-  m_dllAvFormat.Unload();
   pthread_mutex_destroy(&m_lock);
 }
 

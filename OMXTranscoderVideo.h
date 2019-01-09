@@ -22,9 +22,15 @@
 #ifndef _OMX_PLAYERVIDEO_H_
 #define _OMX_PLAYERVIDEO_H_
 
-#include "DllAvUtil.h"
-#include "DllAvFormat.h"
-#include "DllAvCodec.h"
+#include "utils/log.h"
+
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/avutil.h>
+#include <libavutil/crc.h>
+#include <libavutil/fifo.h>
+}
 
 #include "OMXReader.h"
 #include "OMXClock.h"
@@ -46,9 +52,6 @@ protected:
   AVStream                  *m_pStream;
   int                       m_stream_id;
   std::deque<OMXPacket *>   m_packets;
-  DllAvUtil                 m_dllAvUtil;
-  DllAvCodec                m_dllAvCodec;
-  DllAvFormat               m_dllAvFormat;
   bool                      m_open;
   double                    m_iCurrentPts;
   pthread_cond_t            m_packet_cond;

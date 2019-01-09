@@ -121,7 +121,7 @@ static int dvd_file_read(void *h, uint8_t* buf, int size)
   return pFile->Read(buf, size);
 }
 
-static offset_t dvd_file_seek(void *h, offset_t pos, int whence)
+static int64_t dvd_file_seek(void *h, int64_t pos, int whence)
 {
   RESET_TIMEOUT(1);
   if(interrupt_cb(NULL))

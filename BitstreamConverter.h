@@ -23,9 +23,16 @@
 #define _BITSTREAMCONVERTER_H_
 
 #include <stdint.h>
-#include "DllAvUtil.h"
-#include "DllAvFormat.h"
-#include "DllAvCodec.h"
+#include "utils/log.h"
+#include "utils/StdString.h"
+
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/avutil.h>
+#include <libavutil/crc.h>
+#include <libavutil/fifo.h>
+}
 
 typedef struct {
   uint8_t *buffer, *start;
