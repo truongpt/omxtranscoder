@@ -55,9 +55,6 @@ void OMXMuxer::UnLock()
 
 bool OMXMuxer::Open(AVFormatContext *input_ctx, char* file)
 {
-  if (!m_dllAvUtil.Load() || !m_dllAvCodec.Load() || !m_dllAvFormat.Load())
-    return false;
-
 #ifdef TEST_RAW_VIDEO
   p_test_file = fopen ("test.264","wb");
 #endif
@@ -65,8 +62,8 @@ bool OMXMuxer::Open(AVFormatContext *input_ctx, char* file)
   ASSERT(input_ctx != NULL);
   is_ready_write = false;
 
-  m_dllAvFormat.av_register_all();
-  m_dllAvFormat.avformat_network_init();
+  av_register_all();
+  avformat_network_init();
 
   filename = file;
   printf("output file %s\n",  filename);
@@ -86,9 +83,6 @@ bool OMXMuxer::Close()
   fclose(p_test_file);
 #endif
 
-  m_dllAvUtil.Unload();
-  m_dllAvCodec.Unload();
-  m_dllAvFormat.Unload();
   return true;
 }
 
@@ -122,7 +116,7 @@ bool OMXMuxer::OmxBuf2AvPkt(OMX_BUFFERHEADERTYPE* pBuffer)
   int64_t start_vpts;
 
   pkt.stream_index =  outindex;
-  m_dllAvCodec.av_init_packet(&pkt);
+  av_init_packet(&pkt);
 
   pkt.data = reinterpret_cast<uint8_t*>(malloc(pBuffer->nFilledLen));
   memcpy(pkt.data, pBuffer->pBuffer + pBuffer->nOffset, pBuffer->nFilledLen);
@@ -133,18 +127,18 @@ bool OMXMuxer::OmxBuf2AvPkt(OMX_BUFFERHEADERTYPE* pBuffer)
     pkt.flags |= AV_PKT_FLAG_KEY;
   }
 
-  start_vpts = m_dllAvUtil.av_rescale_q(o_context->start_time, AV_TIME_BASE_Q, o_context->streams[outindex]->time_base);
-  pkt.pts = m_dllAvUtil.av_rescale_q(FromOMXTime(tick), AV_TIME_BASE_Q, o_context->streams[outindex]->time_base) + start_vpts;
+  start_vpts = av_rescale_q(o_context->start_time, AV_TIME_BASE_Q, o_context->streams[outindex]->time_base);
+  pkt.pts = av_rescale_q(FromOMXTime(tick), AV_TIME_BASE_Q, o_context->streams[outindex]->time_base) + start_vpts;
   pkt.dts = AV_NOPTS_VALUE;
 
-  int ret  = m_dllAvFormat.av_interleaved_write_frame(o_context, &pkt);
+  int ret  = av_interleaved_write_frame(o_context, &pkt);
   return (0 == ret);
 }
 
 void OMXMuxer::WriteParameterSet(OMX_BUFFERHEADERTYPE* pBuffer)
 {
   AVPacket pkt;
-  m_dllAvCodec.av_init_packet(&pkt);
+  av_init_packet(&pkt);
   int outindex = 0;
   int ret = 0;
 
@@ -172,7 +166,7 @@ void OMXMuxer::WriteParameterSet(OMX_BUFFERHEADERTYPE* pBuffer)
     AVCodecContext *c;
     c = o_context->streams[0]->codec;
     if (c->extradata) {
-      m_dllAvUtil.av_free(c->extradata);
+      av_free(c->extradata);
       c->extradata = NULL;
       c->extradata_size = 0;
     }
@@ -183,13 +177,13 @@ void OMXMuxer::WriteParameterSet(OMX_BUFFERHEADERTYPE* pBuffer)
       memcpy(c->extradata, sps, sps_size);
       memcpy(&c->extradata[sps_size], pps, pps_size);
 
-      ret = m_dllAvFormat.avio_open(&o_context->pb, filename, AVIO_FLAG_WRITE);
+      ret = avio_open(&o_context->pb, filename, AVIO_FLAG_WRITE);
       if (ret < 0) {
 	MUX_PRINT("%s %d file %s avio_open error \n",__func__,__LINE__,filename);
 	return;
       }
       
-      ret = m_dllAvFormat.avformat_write_header(o_context, NULL);
+      ret = avformat_write_header(o_context, NULL);
       if (ret < 0) {
 	MUX_PRINT("%s %d file Failed to write header \n",__func__,__LINE__);
 	return;
@@ -205,8 +199,8 @@ bool OMXMuxer::AddPacket(AVPacket* pAvpkt)
 
   CLog::Log(LOGDEBUG,"%s line %d AUDIO pAvpkt->size %d pApkt->pts %lld\n",__func__,__LINE__,pAvpkt->size,pAvpkt->pts);
   Lock();
-  int ret = m_dllAvFormat.av_interleaved_write_frame(o_context, pAvpkt);
-  m_dllAvFormat.av_packet_unref(pAvpkt);
+  int ret = av_interleaved_write_frame(o_context, pAvpkt);
+  av_packet_unref(pAvpkt);
   UnLock();
   return (0 == ret);
 }
@@ -221,13 +215,13 @@ AVFormatContext* OMXMuxer::CreatOutContext(AVFormatContext *i_context, const cha
   AVCodecContext	*cc;
   int			streamindex = 0;
 
-  fmt = m_dllAvFormat.av_guess_format("mpegts", oname, NULL);
+  fmt = av_guess_format("mpegts", oname, NULL);
   if (!fmt) {
     MUX_PRINT("Can not guess format\n");
     CLog::Log(LOGDEBUG, "Can not guess format\n");
   }
 
-  o_context = m_dllAvFormat.avformat_alloc_context();
+  o_context = avformat_alloc_context();
   if (!o_context) {
     MUX_PRINT("Failed to alloc outputcontext\n");
     return NULL;
@@ -246,7 +240,7 @@ AVFormatContext* OMXMuxer::CreatOutContext(AVFormatContext *i_context, const cha
   for (i = 0; i < i_context->nb_streams; i++) {
     iflow = i_context->streams[i];
     if (i == idx) { /* Creating codec context for Video */
-      oflow = m_dllAvFormat.avformat_new_stream(o_context, NULL);
+      oflow = avformat_new_stream(o_context, NULL);
       ASSERT(oflow != NULL);
       cc = oflow->codec;
       cc->width = iflow->codec->width;
@@ -295,9 +289,9 @@ AVFormatContext* OMXMuxer::CreatOutContext(AVFormatContext *i_context, const cha
       }
 
       MUX_PRINT("%s %d stream index %d\n",__func__,__LINE__,i);
-      oflow = m_dllAvFormat.avformat_new_stream(o_context, iflow->codec->codec);
+      oflow = avformat_new_stream(o_context, iflow->codec->codec);
       ASSERT(oflow != NULL);
-      m_dllAvCodec.avcodec_copy_context(oflow->codec, iflow->codec);
+      avcodec_copy_context(oflow->codec, iflow->codec);
       /* Reset the codec tag so as not to cause problems with output format */
       oflow->codec->codec_tag = 0; 
     }

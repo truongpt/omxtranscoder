@@ -62,9 +62,6 @@ private:
   AVOutputFormat *fmt;
   AVFormatContext *o_context;
   AVFormatContext *i_context;
-  DllAvUtil m_dllAvUtil;
-  DllAvCodec m_dllAvCodec;
-  DllAvFormat m_dllAvFormat;  
   bool is_ready_write;
   uint8_t *sps, *pps;
   int sps_size = 0, pps_size = 0;
