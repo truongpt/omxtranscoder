@@ -25,7 +25,7 @@
 #include "system.h"
 #endif
 
-#include "OMXPlayerVideo.h"
+#include "OMXTranscoderVideo.h"
 
 #include <stdio.h>
 #include <unistd.h>

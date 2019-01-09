@@ -21,24 +21,24 @@ SRC=	linux/XMemUtils.cpp \
 		OMXVideo.cpp \
 		OMXClock.cpp \
 		File.cpp \
-		OMXPlayerVideo.cpp \
+		OMXTranscoderVideo.cpp \
 		OMXMuxer.cpp \
 		Srt.cpp \
-		omxplayer.cpp
+		omxtranscoder.cpp
 
 OBJS+=$(filter %.o,$(SRC:.cpp=.o))
 
-all: omxplayer
+all: omxtranscoder
 
 %.o: %.cpp
 	@rm -f $@ 
 	$(CXX) $(CFLAGS) $(INCLUDES) -c $< -o $@ -Wno-deprecated-declarations
 
-omxplayer: $(OBJS)
-	$(CXX) $(LDFLAGS) -o omxplayer $(OBJS) -lvchiq_arm -lvchostif -lvcos -ldbus-1 -lrt -lpthread -lavutil -lavcodec -lavformat -lswscale -lswresample -lpcre
-	$(STRIP) omxplayer
+omxtranscoder: $(OBJS)
+	$(CXX) $(LDFLAGS) -o omxtranscoder $(OBJS) -lvchiq_arm -lvchostif -lvcos -ldbus-1 -lrt -lpthread -lavutil -lavcodec -lavformat -lswscale -lswresample -lpcre
+	$(STRIP) omxtranscoder
 
 clean:
 	for i in $(OBJS); do (if test -e "$$i"; then ( rm $$i ); fi ); done
 	@rm -f omxplayer.old.log omxplayer.log
-	@rm -f omxplayer
+	@rm -f omxtranscoder
