@@ -26,11 +26,11 @@ INCLUDES+=-I./ -Ilinux -I /usr/include/dbus-1.0 -I /usr/lib/arm-linux-gnueabihf/
 SRC=	linux/XMemUtils.cpp \
 		linux/OMXAlsa.cpp \
 		utils/log.cpp \
-		DynamicDll.cpp \
 		utils/PCMRemap.cpp \
 		utils/RegExp.cpp \
 		BitstreamConverter.cpp \
 		linux/RBP.cpp \
+		DynamicDll.cpp \
 		OMXThread.cpp \
 		OMXReader.cpp \
 		OMXStreamInfo.cpp \

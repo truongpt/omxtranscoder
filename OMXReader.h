@@ -103,9 +103,6 @@ protected:
   int                       m_video_count;
   int                       m_audio_count;
   int                       m_subtitle_count;
-  DllAvUtil                 m_dllAvUtil;
-  DllAvCodec                m_dllAvCodec;
-  DllAvFormat               m_dllAvFormat;
   bool                      m_open;
   std::string               m_filename;
   bool                      m_bMatroska;

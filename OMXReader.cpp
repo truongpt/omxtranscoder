@@ -136,8 +136,6 @@ static offset_t dvd_file_seek(void *h, offset_t pos, int whence)
 
 bool OMXReader::Open(std::string filename, bool dump_format, bool live /* =false */, float timeout /* = 0.0f */, std::string cookie /* = "" */, std::string user_agent /* = "" */, std::string lavfdopts /* = "" */, std::string avdict /* = "" */)
 {
-  if (!m_dllAvUtil.Load() || !m_dllAvCodec.Load() || !m_dllAvFormat.Load())
-    return false;
 
   timeout_default_duration = (int64_t) (timeout * 1e9);
   m_iCurrentPts = DVD_NOPTS_VALUE;
@@ -149,18 +147,18 @@ bool OMXReader::Open(std::string filename, bool dump_format, bool live /* =false
 
   ClearStreams();
 
-  m_dllAvFormat.av_register_all();
-  m_dllAvFormat.avformat_network_init();
-  m_dllAvUtil.av_log_set_level(dump_format ? AV_LOG_INFO:AV_LOG_QUIET);
+  av_register_all();
+  avformat_network_init();
+  av_log_set_level(dump_format ? AV_LOG_INFO:AV_LOG_QUIET);
 
   int           result    = -1;
   AVInputFormat *iformat  = NULL;
   unsigned char *buffer   = NULL;
   unsigned int  flags     = READ_TRUNCATED | READ_BITRATE | READ_CHUNKED;
 
-  m_pFormatContext     = m_dllAvFormat.avformat_alloc_context();
+  m_pFormatContext     = avformat_alloc_context();
 
-  result = m_dllAvFormat.av_set_options_string(m_pFormatContext, lavfdopts.c_str(), ":", ",");
+  result = av_set_options_string(m_pFormatContext, lavfdopts.c_str(), ":", ",");
 
   if (result < 0)
   {
@@ -170,7 +168,7 @@ bool OMXReader::Open(std::string filename, bool dump_format, bool live /* =false
   }
 
   AVDictionary *d = NULL;
-  result = m_dllAvUtil.av_dict_parse_string(&d, avdict.c_str(), ":", ",", 0);
+  result = av_dict_parse_string(&d, avdict.c_str(), ":", ",", 0);
 
   if (result < 0)
   {
@@ -224,7 +222,7 @@ bool OMXReader::Open(std::string filename, bool dump_format, bool live /* =false
        }
     }
     CLog::Log(LOGDEBUG, "COMXPlayer::OpenFile - avformat_open_input %s ", m_filename.c_str());
-    result = m_dllAvFormat.avformat_open_input(&m_pFormatContext, m_filename.c_str(), iformat, &d);
+    result = avformat_open_input(&m_pFormatContext, m_filename.c_str(), iformat, &d);
     if(av_dict_count(d) == 0)
     {
        CLog::Log(LOGDEBUG, "COMXPlayer::OpenFile - avformat_open_input enabled SEEKING ");
@@ -250,8 +248,8 @@ bool OMXReader::Open(std::string filename, bool dump_format, bool live /* =false
       return false;
     }
 
-    buffer = (unsigned char*)m_dllAvUtil.av_malloc(FFMPEG_FILE_BUFFER_SIZE);
-    m_ioContext = m_dllAvFormat.avio_alloc_context(buffer, FFMPEG_FILE_BUFFER_SIZE, 0, m_pFile, dvd_file_read, NULL, dvd_file_seek);
+    buffer = (unsigned char*)av_malloc(FFMPEG_FILE_BUFFER_SIZE);
+    m_ioContext = avio_alloc_context(buffer, FFMPEG_FILE_BUFFER_SIZE, 0, m_pFile, dvd_file_read, NULL, dvd_file_seek);
     m_ioContext->max_packet_size = 6144;
     if(m_ioContext->max_packet_size)
       m_ioContext->max_packet_size *= FFMPEG_FILE_BUFFER_SIZE / m_ioContext->max_packet_size;
@@ -259,7 +257,7 @@ bool OMXReader::Open(std::string filename, bool dump_format, bool live /* =false
     if(m_pFile->IoControl(IOCTRL_SEEK_POSSIBLE, NULL) == 0)
       m_ioContext->seekable = 0;
 
-    m_dllAvFormat.av_probe_input_buffer(m_ioContext, &iformat, m_filename.c_str(), NULL, 0, 0);
+    av_probe_input_buffer(m_ioContext, &iformat, m_filename.c_str(), NULL, 0, 0);
 
     if(!iformat)
     {
@@ -269,7 +267,7 @@ bool OMXReader::Open(std::string filename, bool dump_format, bool live /* =false
     }
 
     m_pFormatContext->pb = m_ioContext;
-    result = m_dllAvFormat.avformat_open_input(&m_pFormatContext, m_filename.c_str(), iformat, &d);
+    result = avformat_open_input(&m_pFormatContext, m_filename.c_str(), iformat, &d);
     av_dict_free(&d);
     if(result < 0)
     {
@@ -291,7 +289,7 @@ bool OMXReader::Open(std::string filename, bool dump_format, bool live /* =false
   if (live)
     m_pFormatContext->flags |= AVFMT_FLAG_NOBUFFER;
 
-  result = m_dllAvFormat.avformat_find_stream_info(m_pFormatContext, NULL);
+  result = avformat_find_stream_info(m_pFormatContext, NULL);
   if(result < 0)
   {
     Close();
@@ -321,7 +319,7 @@ bool OMXReader::Open(std::string filename, bool dump_format, bool live /* =false
   m_speed       = DVD_PLAYSPEED_NORMAL;
 
   if(dump_format)
-    m_dllAvFormat.av_dump_format(m_pFormatContext, 0, m_filename.c_str(), 0);
+    av_dump_format(m_pFormatContext, 0, m_filename.c_str(), 0);
 
   UpdateCurrentPTS();
 
@@ -368,13 +366,13 @@ bool OMXReader::Close()
       CLog::Log(LOGWARNING, "CDVDDemuxFFmpeg::Dispose - demuxer changed our byte context behind our back, possible memleak");
       m_ioContext = m_pFormatContext->pb;
     }
-    m_dllAvFormat.avformat_close_input(&m_pFormatContext);
+    avformat_close_input(&m_pFormatContext);
   }
 
   if(m_ioContext)
   {
-    m_dllAvUtil.av_free(m_ioContext->buffer);
-    m_dllAvUtil.av_free(m_ioContext);
+    av_free(m_ioContext->buffer);
+    av_free(m_ioContext);
   }
   
   m_ioContext       = NULL;
@@ -387,11 +385,7 @@ bool OMXReader::Close()
     m_pFile = NULL;
   }
 
-  m_dllAvFormat.avformat_network_deinit();
-
-  m_dllAvUtil.Unload();
-  m_dllAvCodec.Unload();
-  m_dllAvFormat.Unload();
+  avformat_network_deinit();
 
   m_open            = false;
   m_filename        = "";
@@ -449,7 +443,7 @@ bool OMXReader::SeekTime(int time, bool backwords, double *startpts)
     seek_pts += m_pFormatContext->start_time;
 
   RESET_TIMEOUT(1);
-  int ret = m_dllAvFormat.av_seek_frame(m_pFormatContext, -1, seek_pts, backwords ? AVSEEK_FLAG_BACKWARD : 0);
+  int ret = av_seek_frame(m_pFormatContext, -1, seek_pts, backwords ? AVSEEK_FLAG_BACKWARD : 0);
 
   if(ret >= 0)
     UpdateCurrentPTS();
@@ -500,12 +494,12 @@ OMXPacket *OMXReader::Read()
   m_av_pkt.stream_index = MAX_OMX_STREAMS;
 
   RESET_TIMEOUT(1);
-  result = m_dllAvFormat.av_read_frame(m_pFormatContext, &m_av_pkt);
+  result = av_read_frame(m_pFormatContext, &m_av_pkt);
   if (result < 0)
   {
     m_eof = true;
     //FlushRead();
-    //m_dllAvCodec.av_free_packet(&m_av_pkt);
+    //av_free_packet(&m_av_pkt);
     UnLock();
     return NULL;
   }
@@ -519,7 +513,7 @@ OMXPacket *OMXReader::Read()
       //FlushRead();
     }
 
-    m_dllAvCodec.av_free_packet(&m_av_pkt);
+    av_free_packet(&m_av_pkt);
 
     m_eof = true;
     UnLock();
@@ -538,7 +532,7 @@ OMXPacket *OMXReader::Read()
   /*
   if(!IsActive(m_av_pkt.stream_index))
   {
-    m_dllAvCodec.av_free_packet(&m_av_pkt);
+    av_free_packet(&m_av_pkt);
     UnLock();
     return NULL;
   }
@@ -581,7 +575,7 @@ OMXPacket *OMXReader::Read()
   if(!m_omx_pkt)
   {
     m_eof = true;
-    m_dllAvCodec.av_free_packet(&m_av_pkt);
+    av_free_packet(&m_av_pkt);
     UnLock();
     return NULL;
   }
@@ -623,7 +617,7 @@ OMXPacket *OMXReader::Read()
     if(duration > pStream->duration)
     {
       pStream->duration = duration;
-      duration = m_dllAvUtil.av_rescale_rnd(pStream->duration, (int64_t)pStream->time_base.num * AV_TIME_BASE, 
+      duration = av_rescale_rnd(pStream->duration, (int64_t)pStream->time_base.num * AV_TIME_BASE, 
                                             pStream->time_base.den, AV_ROUND_NEAR_INF);
       if ((m_pFormatContext->duration == (int64_t)AV_NOPTS_VALUE)
           ||  (m_pFormatContext->duration != (int64_t)AV_NOPTS_VALUE && duration > m_pFormatContext->duration))
@@ -631,7 +625,7 @@ OMXPacket *OMXReader::Read()
     }
   }
 
-  m_dllAvCodec.av_free_packet(&m_av_pkt);
+  av_free_packet(&m_av_pkt);
   UnLock();
   return m_omx_pkt;
 }
@@ -643,7 +637,7 @@ AVPacket *OMXReader::GetPacket()
 
 bool OMXReader::FreePacket()
 {
-  m_dllAvCodec.av_free_packet(&m_av_pkt);
+  av_free_packet(&m_av_pkt);
   UnLock();
   return true;
 }
@@ -721,7 +715,7 @@ bool OMXReader::GetStreams()
       m_chapters[i].ts        = m_chapters[i].seekto_ms / 1000;
 
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,83,0)
-      AVDictionaryEntry *titleTag = m_dllAvUtil.av_dict_get(m_pFormatContext->chapters[i]->metadata,"title", NULL, 0);
+      AVDictionaryEntry *titleTag = av_dict_get(m_pFormatContext->chapters[i]->metadata,"title", NULL, 0);
       if (titleTag)
         m_chapters[i].name = titleTag->value;
 #else
@@ -782,7 +776,7 @@ void OMXReader::AddStream(int id)
   }
 
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,83,0)
-  AVDictionaryEntry *langTag = m_dllAvUtil.av_dict_get(pStream->metadata, "language", NULL, 0);
+  AVDictionaryEntry *langTag = av_dict_get(pStream->metadata, "language", NULL, 0);
   if (langTag)
     strncpy(m_streams[id].language, langTag->value, 3);
 #else
@@ -790,7 +784,7 @@ void OMXReader::AddStream(int id)
 #endif
 
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,83,0)
-  AVDictionaryEntry *titleTag = m_dllAvUtil.av_dict_get(pStream->metadata,"title", NULL, 0);
+  AVDictionaryEntry *titleTag = av_dict_get(pStream->metadata,"title", NULL, 0);
   if (titleTag)
     m_streams[id].name = titleTag->value;
 #else
@@ -967,7 +961,7 @@ bool OMXReader::GetHints(AVStream *stream, COMXStreamInfo *hints)
 
     if (m_bAVI && stream->codec->codec_id == AV_CODEC_ID_H264)
       hints->ptsinvalid = true;
-    AVDictionaryEntry *rtag = m_dllAvUtil.av_dict_get(stream->metadata, "rotate", NULL, 0);
+    AVDictionaryEntry *rtag = av_dict_get(stream->metadata, "rotate", NULL, 0);
     if (rtag)
       hints->orientation = atoi(rtag->value);
     m_aspect = hints->aspect;
@@ -1149,7 +1143,7 @@ void OMXReader::GetChapterName(std::string& strChapterName)
   // API added on: 2010-10-15
   // (Note that while the function was available earlier, the generic
   // metadata tags were not populated by default)
-  AVDictionaryEntry *titleTag = m_dllAvUtil.av_dict_get(m_pFormatContext->chapters[chapterIdx-1]->metadata,
+  AVDictionaryEntry *titleTag = av_dict_get(m_pFormatContext->chapters[chapterIdx-1]->metadata,
                                                               "title", NULL, 0);
   if (titleTag)
     strChapterName = titleTag->value;
@@ -1182,11 +1176,11 @@ void OMXReader::SetSpeed(int iSpeed)
 
   if(m_speed != DVD_PLAYSPEED_PAUSE && iSpeed == DVD_PLAYSPEED_PAUSE)
   {
-    m_dllAvFormat.av_read_pause(m_pFormatContext);
+    av_read_pause(m_pFormatContext);
   }
   else if(m_speed == DVD_PLAYSPEED_PAUSE && iSpeed != DVD_PLAYSPEED_PAUSE)
   {
-    m_dllAvFormat.av_read_play(m_pFormatContext);
+    av_read_play(m_pFormatContext);
   }
   m_speed = iSpeed;
 
@@ -1279,7 +1273,7 @@ std::string OMXReader::GetStreamCodecName(AVStream *stream)
   }
 #endif
 
-  AVCodec *codec = m_dllAvCodec.avcodec_find_decoder(stream->codec->codec_id);
+  AVCodec *codec = avcodec_find_decoder(stream->codec->codec_id);
 
   if (codec)
     strStreamName = codec->name;
