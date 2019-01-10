@@ -77,7 +77,6 @@ SRC=	linux/XMemUtils.cpp \
 		utils/PCMRemap.cpp \
 		utils/RegExp.cpp \
 		BitstreamConverter.cpp \
-		DynamicDll.cpp \
 		OMXThread.cpp \
 		OMXReader.cpp \
 		OMXStreamInfo.cpp \

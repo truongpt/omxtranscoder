@@ -55,7 +55,6 @@ extern "C" {
 #include "OMXReader.h"
 #include "OMXTranscoderVideo.h"
 #include "OMXMuxer.h"
-#include "DllOMX.h"
 #include "Srt.h"
 #include "utils/Strprintf.h"
 
