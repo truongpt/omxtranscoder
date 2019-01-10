@@ -21,15 +21,12 @@ CFLAGS +=  -mfloat-abi=hard \
 			-mstructure-size-boundary=32 \
 			-mno-sched-prolog \
 			-march=armv6zk \
-			-I/usr/include/dbus-1.0 \
-			-I/usr/lib/arm-linux-gnueabihf/dbus-1.0/include 
 
 LDFLAGS		+= -L/opt/vc/lib -L/lib -L/usr/lib -lfreetype
 INCLUDES	+= -I/opt/vc/include/interface/vcos/pthreads \
 				-I/opt/vc/include \
 				-I/opt/vc/include/interface/vmcs_host \
 				-I/opt/vc/include/interface/vmcs_host/linux \
-				-I/usr/lib/arm-linux-gnueabihf/dbus-1.0/include \
 				-I/usr/include \
 				-I/usr/include/freetype2
 
@@ -67,9 +64,7 @@ CFLAGS    +=-std=c++0x \
 LDFLAGS+=-L./ -lc -lWFC -lGLESv2 -lEGL -lbcm_host -lopenmaxil -lfreetype -lz -lasound
 
 INCLUDES+=-I./ \
-			-Ilinux \
-			-I/usr/include/dbus-1.0 \
-			-I/usr/lib/arm-linux-gnueabihf/dbus-1.0/include
+			-Ilinux
 
 SRC=	linux/XMemUtils.cpp \
 		utils/log.cpp \
@@ -83,7 +78,6 @@ SRC=	linux/XMemUtils.cpp \
 		File.cpp \
 		OMXTranscoderVideo.cpp \
 		OMXMuxer.cpp \
-		Srt.cpp \
 		omxtranscoder.cpp
 
 OBJS+=$(filter %.o,$(SRC:.cpp=.o))
@@ -95,7 +89,7 @@ all: omxtranscoder
 	$(CXX) $(CFLAGS) $(INCLUDES) -c $< -o $@ -Wno-deprecated-declarations
 
 omxtranscoder: $(OBJS)
-	$(CXX) $(LDFLAGS) -o omxtranscoder $(OBJS) -lvchiq_arm -lvchostif -lvcos -ldbus-1 -lrt -lpthread -lavutil -lavcodec -lavformat -lswscale -lswresample -lpcre
+	$(CXX) $(LDFLAGS) -o omxtranscoder $(OBJS) -lvchiq_arm -lvchostif -lvcos -lrt -lpthread -lavutil -lavcodec -lavformat -lswscale -lswresample -lpcre
 	$(STRIP) omxtranscoder
 
 clean:
