@@ -23,6 +23,10 @@
 
 #include <string>
 #include <queue>
+#include <stdio.h>
+#include <string.h>
+#include <cassert>
+#include <utils/StdString.h>
 
 // TODO: should this be in configure
 #ifndef OMX_SKIP64BIT
@@ -45,6 +49,37 @@
 #define OMX_DEBUG_EVENTHANDLER
 #endif
 
+#define OMX_MAX_PORTS 10
+
+#define DVD_TIME_BASE 1000000
+#define DVD_NOPTS_VALUE    (-1LL<<52) // should be possible to represent in both double and __int64
+
+#define DVD_TIME_TO_SEC(x)  ((int)((double)(x) / DVD_TIME_BASE))
+#define DVD_TIME_TO_MSEC(x) ((int)((double)(x) * 1000 / DVD_TIME_BASE))
+#define DVD_SEC_TO_TIME(x)  ((double)(x) * DVD_TIME_BASE)
+#define DVD_MSEC_TO_TIME(x) ((double)(x) * DVD_TIME_BASE / 1000)
+
+#define DVD_PLAYSPEED_PAUSE       0       // frame stepping
+#define DVD_PLAYSPEED_NORMAL      100
+
+#ifdef OMX_SKIP64BIT
+static inline OMX_TICKS ToOMXTime(int64_t pts)
+{
+  OMX_TICKS ticks;
+  ticks.nLowPart = pts;
+  ticks.nHighPart = pts >> 32;
+  return ticks;
+}
+static inline int64_t FromOMXTime(OMX_TICKS ticks)
+{
+  int64_t pts = ticks.nLowPart | ((uint64_t)(ticks.nHighPart) << 32);
+  return pts;
+}
+#else
+#define FromOMXTime(x) (x)
+#define ToOMXTime(x) (x)
+#endif
+
 #define OMX_INIT_STRUCTURE(a)                           \
     memset(&(a), 0, sizeof(a));                         \
     (a).nSize = sizeof(a);                              \
@@ -52,8 +87,6 @@
     (a).nVersion.s.nVersionMinor = OMX_VERSION_MINOR;   \
     (a).nVersion.s.nRevision = OMX_VERSION_REVISION;    \
     (a).nVersion.s.nStep = OMX_VERSION_STEP
-
-#define OMX_MAX_PORTS 10
 
 typedef struct omx_event {
     OMX_EVENTTYPE eEvent;
@@ -208,6 +241,7 @@ private:
     enc_done_cbk m_enc_private_cb;  
 };
 
+void OMXSleep(unsigned int dwMilliSeconds);
 
 #endif
 

@@ -33,7 +33,6 @@ extern "C" {
 }
 
 #include "OMXReader.h"
-#include "OMXClock.h"
 #include "OMXStreamInfo.h"
 #include "OMXVideo.h"
 #include "OMXThread.h"
@@ -58,7 +57,6 @@ protected:
   pthread_cond_t            m_picture_cond;
   pthread_mutex_t           m_lock;
   pthread_mutex_t           m_lock_decoder;
-  OMXClock                  *m_av_clock;
   COMXVideo                 *m_decoder;
   float                     m_fps;
   double                    m_frametime;
@@ -78,7 +76,7 @@ private:
 public:
   OMXPlayerVideo();
   ~OMXPlayerVideo();
-  bool Open(OMXClock *av_clock, const OMXVideoConfig &config);
+  bool Open(const OMXVideoConfig &config);
   bool Close();
   bool Reset();
   bool Decode(OMXPacket *pkt);

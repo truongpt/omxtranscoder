@@ -74,7 +74,6 @@ SRC=	linux/XMemUtils.cpp \
 		OMXStreamInfo.cpp \
 		OMXCore.cpp \
 		OMXVideo.cpp \
-		OMXClock.cpp \
 		File.cpp \
 		OMXTranscoderVideo.cpp \
 		OMXMuxer.cpp \

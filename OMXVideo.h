@@ -24,12 +24,9 @@
 
 #include "OMXCore.h"
 #include "OMXStreamInfo.h"
-
-#include <IL/OMX_Video.h>
-
-#include "OMXClock.h"
 #include "OMXReader.h"
 
+#include <IL/OMX_Video.h>
 #include "utils/SingleLock.h"
 
 #define VIDEO_BUFFERS 60
@@ -89,7 +86,7 @@ public:
   // Required overrides
   bool SendDecoderConfig();
   bool NaluFormatStartCodes(enum AVCodecID codec, uint8_t *in_extradata, int in_extrasize);
-  bool Open(OMXClock *clock, const OMXVideoConfig &config);
+  bool Open(const OMXVideoConfig &config);
   bool PortSettingsChanged();
   void PortSettingsChangedLogger(OMX_PARAM_PORTDEFINITIONTYPE port_image, int interlaceEMode);
   void Close(void);

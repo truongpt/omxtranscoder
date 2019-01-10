@@ -26,7 +26,6 @@
 #endif
 
 #include "OMXReader.h"
-#include "OMXClock.h"
 
 #include <stdio.h>
 #include <unistd.h>

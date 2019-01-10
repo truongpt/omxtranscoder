@@ -36,6 +36,8 @@ extern "C" {
 
 #include "OMXStreamInfo.h"
 #include "OMXThread.h"
+#include "OMXCore.h"
+
 #include <queue>
 
 #include "OMXStreamInfo.h"

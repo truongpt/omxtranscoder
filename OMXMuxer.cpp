@@ -16,7 +16,6 @@
 #endif
 
 #include "OMXMuxer.h"
-#include "OMXClock.h"
 
 #include <stdio.h>
 #include <unistd.h>

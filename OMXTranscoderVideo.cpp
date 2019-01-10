@@ -41,7 +41,6 @@ OMXPlayerVideo::OMXPlayerVideo()
   m_open          = false;
   m_stream_id     = -1;
   m_pStream       = NULL;
-  m_av_clock      = NULL;
   m_decoder       = NULL;
   m_fps           = 25.0f;
   m_flush         = false;
@@ -90,7 +89,7 @@ void OMXPlayerVideo::UnLockDecoder()
     pthread_mutex_unlock(&m_lock_decoder);
 }
 
-bool OMXPlayerVideo::Open(OMXClock *av_clock, const OMXVideoConfig &config)
+bool OMXPlayerVideo::Open(const OMXVideoConfig &config)
 {
 
   if(ThreadHandle())
@@ -189,7 +188,7 @@ bool OMXPlayerVideo::Decode(OMXPacket *pkt)
 
   while((int) m_decoder->GetFreeSpace() < pkt->size)
   {
-    OMXClock::OMXSleep(10);
+    OMXSleep(10);
     if(m_flush_requested) return true;
   }
 
@@ -314,7 +313,7 @@ bool OMXPlayerVideo::OpenDecoder()
   m_frametime = (double)DVD_TIME_BASE / m_fps;
 
   m_decoder = new COMXVideo();
-  if(!m_decoder->Open(m_av_clock, m_config))
+  if(!m_decoder->Open(m_config))
   {
     CloseDecoder();
     return false;

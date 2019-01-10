@@ -50,7 +50,6 @@ extern "C" {
 }
 
 #include "OMXVideo.h"
-#include "OMXClock.h"
 #include "OMXReader.h"
 #include "OMXTranscoderVideo.h"
 #include "OMXMuxer.h"
@@ -163,7 +162,7 @@ int main(int argc, char *argv[])
     if(m_audio_index_use > 0)
         m_omx_reader.SetActiveStream(OMXSTREAM_AUDIO, m_audio_index_use-1);
 
-    if(m_has_video && !m_transcoder_video.Open(NULL, m_config_video))
+    if(m_has_video && !m_transcoder_video.Open(m_config_video))
         goto do_exit;
 
     m_transcoder_video.SetCallBack(&enc_done_callback);
@@ -181,7 +180,7 @@ int main(int argc, char *argv[])
             if(m_transcoder_video.AddPacket(m_omx_pkt))
                 m_omx_pkt = NULL;
             else
-                OMXClock::OMXSleep(10);
+                OMXSleep(10);
         }
         else if(m_has_audio && m_omx_reader.GetCodecType() == AVMEDIA_TYPE_AUDIO)
         {
@@ -199,7 +198,7 @@ int main(int argc, char *argv[])
                 m_omx_pkt = NULL;
             }
             else
-                OMXClock::OMXSleep(10);
+                OMXSleep(10);
         }
     }
 

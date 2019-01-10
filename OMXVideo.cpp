@@ -489,7 +489,7 @@ bool COMXVideo::PortSettingsChanged()
   return true;
 }
 
-bool COMXVideo::Open(OMXClock *clock, const OMXVideoConfig &config)
+bool COMXVideo::Open(const OMXVideoConfig &config)
 {
   // CSingleLock lock (m_critSection);
   bool vflip = false;

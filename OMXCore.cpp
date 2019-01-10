@@ -30,8 +30,6 @@
 #if defined(HAVE_OMXLIB)
 #include "OMXCore.h"
 #include "utils/log.h"
-
-#include "OMXClock.h"
 #include "XMemUtils.h"
 
 //#define OMX_DEBUG_EVENTS
@@ -1782,6 +1780,15 @@ OMX_ERRORTYPE COMXCoreComponent::DecoderEventHandler(
     }
 
     return OMX_ErrorNone;
+}
+
+void OMXSleep(unsigned int dwMilliSeconds)
+{
+  struct timespec req;
+  req.tv_sec = dwMilliSeconds / 1000;
+  req.tv_nsec = (dwMilliSeconds % 1000) * 1000000;
+
+  while ( nanosleep(&req, &req) == -1 && errno == EINTR && (req.tv_nsec > 0 || req.tv_sec > 0));
 }
 
 #endif
