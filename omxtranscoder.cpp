@@ -50,7 +50,6 @@ extern "C" {
 }
 
 #include "OMXVideo.h"
-#include "utils/PCMRemap.h"
 #include "OMXClock.h"
 #include "OMXReader.h"
 #include "OMXTranscoderVideo.h"

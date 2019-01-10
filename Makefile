@@ -72,10 +72,7 @@ INCLUDES+=-I./ \
 			-I/usr/lib/arm-linux-gnueabihf/dbus-1.0/include
 
 SRC=	linux/XMemUtils.cpp \
-		linux/OMXAlsa.cpp \
 		utils/log.cpp \
-		utils/PCMRemap.cpp \
-		utils/RegExp.cpp \
 		BitstreamConverter.cpp \
 		OMXThread.cpp \
 		OMXReader.cpp \
