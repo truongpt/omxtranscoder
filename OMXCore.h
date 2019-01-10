@@ -194,7 +194,6 @@ private:
   bool          m_omx_output_use_buffers;
 
   bool          m_exit;
-  DllOMX        *m_DllOMX;
   pthread_cond_t    m_input_buffer_cond;
   pthread_cond_t    m_output_buffer_cond;
   pthread_cond_t    m_omx_event_cond;
