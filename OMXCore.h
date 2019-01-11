@@ -65,15 +65,15 @@
 #ifdef OMX_SKIP64BIT
 static inline OMX_TICKS ToOMXTime(int64_t pts)
 {
-  OMX_TICKS ticks;
-  ticks.nLowPart = pts;
-  ticks.nHighPart = pts >> 32;
-  return ticks;
+    OMX_TICKS ticks;
+    ticks.nLowPart = pts;
+    ticks.nHighPart = pts >> 32;
+    return ticks;
 }
 static inline int64_t FromOMXTime(OMX_TICKS ticks)
 {
-  int64_t pts = ticks.nLowPart | ((uint64_t)(ticks.nHighPart) << 32);
-  return pts;
+    int64_t pts = ticks.nLowPart | ((uint64_t)(ticks.nHighPart) << 32);
+    return pts;
 }
 #else
 #define FromOMXTime(x) (x)

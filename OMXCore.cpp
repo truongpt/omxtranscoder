@@ -18,11 +18,6 @@
  *
  */
 
-#if (defined HAVE_CONFIG_H) && (!defined TARGET_WINDOWS)
-#include "config.h"
-#elif defined(TARGET_WINDOWS)
-#include "system.h"
-#endif
 
 #include <math.h>
 #include <sys/time.h>

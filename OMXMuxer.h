@@ -1,4 +1,7 @@
-/*  This Program is free software; you can redistribute it and/or modify
+/*
+ * Copyright (c) 2019/01 truong <truongptk30a3@gmail.com>
+ *
+ *  This Program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2, or (at your option)
  *  any later version.
