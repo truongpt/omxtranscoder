@@ -6,4 +6,4 @@
 
 # Reference
 - omxtranscoder is developed base on [omxplayer](https://github.com/popcornmix/omxplayer.git)
-- https://vcostudy.com/2018/07/22/raspberry-pi-transcodes-video/
+- https://gravieb.wordpress.com/2018/07/22/raspberry-pi-transcodes-video/
